@@ -31,7 +31,6 @@ const Address = () => {
     setError(null)
     
     try {
-      // Get user's location
       const position = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           resolve,
@@ -47,22 +46,18 @@ const Address = () => {
       const lat = position.coords.latitude
       const lng = position.coords.longitude
       
-      // Format coordinates as requested: "7.44805° N, 3.89421° E"
       const formattedCoords = `${Math.abs(lat).toFixed(5)}° ${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lng).toFixed(5)}° ${lng >= 0 ? 'E' : 'W'}`
       
-      // Data to send to backend (only coordinates)
       const dataToSend = {
-        coordinates: formattedCoords
+        lat: lat,
+        lng: lng
       }
       
-      // Log the data that would be sent to backend
       console.log('Data to send to backend:', dataToSend)
       console.log('Formatted coordinates:', formattedCoords)
       console.log('Address data (not sent to backend):', addressData)
       
-      // Commented out backend call - uncomment when backend is ready
-      /*
-      const response = await fetch('https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/search', {
+      const response = await fetch('https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/search-location', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,25 +73,11 @@ const Address = () => {
       
       console.log('Backend response:', searchResults)
       
-      // Navigate to location page with search results
       navigate('/location', { 
         state: { 
           ...location.state, 
           addressData,
           searchResults,
-          coordinates: formattedCoords,
-          userAtAddress: true 
-        }
-      })
-      */
-      
-      // Temporary navigation for testing (remove when backend is ready)
-      console.log('Navigating to /location with mock data')
-      navigate('/location', { 
-        state: { 
-          ...location.state, 
-          addressData,
-          searchResults: { mockData: 'Backend not ready yet' },
           coordinates: formattedCoords,
           userAtAddress: true 
         }
@@ -130,7 +111,6 @@ const Address = () => {
 
   const isFormValid = addressData.houseNumber?.trim() && addressData.street?.trim() && addressData.city?.trim() && addressData.state?.trim()
 
-  // Question step
   if (step === 'question') {
     return (
       <div className="max-w-lg mx-auto">
@@ -180,7 +160,6 @@ const Address = () => {
     )
   }
 
-  // Initial address input step
   return (
     <div className="max-w-lg mx-auto">
       <div className="mb-8">

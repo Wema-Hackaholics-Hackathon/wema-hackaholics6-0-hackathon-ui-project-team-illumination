@@ -115,6 +115,45 @@ const FlowStatus = ({ locationPermission }) => {
   )
 }
 
+const ConditionalLayout = ({ children, locationPermission }) => {
+  const location = useLocation()
+  const isLocationPage = location.pathname === '/location'
+  
+  if (isLocationPage) {
+    return children
+  }
+  
+  return (
+    <>
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        {locationPermission === 'denied' && (
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center space-x-2 mb-1">
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <span className="text-red-400 text-sm font-medium">Location Access Required</span>
+                </div>
+                <p className="text-red-300 text-xs">
+                  Enable location access to use verification features
+                </p>
+              </div>
+              <button
+                onClick={() => setShowLocationModal(true)}
+                className="bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+              >
+                Grant Permission
+              </button>
+            </div>
+          </div>
+        )}
+        {children}
+      </main>
+    </>
+  )
+}
+
 const App = () => {
   const [locationPermission, setLocationPermission] = useState(null)
   const [showLocationModal, setShowLocationModal] = useState(false)
@@ -221,31 +260,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[#0C0517] text-gray-200">
-        <Header />
-        
-        <main className="container mx-auto px-4 py-8">
-          {locationPermission === 'denied' && (
-            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-red-400 text-sm font-medium">Location Access Required</span>
-                  </div>
-                  <p className="text-red-300 text-xs">
-                    Enable location access to use verification features
-                  </p>
-                </div>
-                <button
-                  onClick={retryLocationPermission}
-                  className="bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
-                >
-                  Grant Permission
-                </button>
-              </div>
-            </div>
-          )}
-          
+        <ConditionalLayout locationPermission={locationPermission}>
           <Routes>
             <Route 
               path="/" 
@@ -296,7 +311,7 @@ const App = () => {
               } 
             />
           </Routes>
-        </main>
+        </ConditionalLayout>
       </div>
     </BrowserRouter>
   )
