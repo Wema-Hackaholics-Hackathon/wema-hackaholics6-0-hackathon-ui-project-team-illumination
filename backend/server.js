@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import kycRoute from "./routes/kycRoute.js";
 import verifyRoutes from "./routes/verifyRoutes.js"
+import searchRoutes from "./routes/searchRoutes.js"
 
 
 dotenv.config()
@@ -17,7 +18,7 @@ app.get("/", (_req, res) => {
   res.json({ ok: true, service: "kyc-trustscore-backend" });
 });
 app.use(kycRoute);
-
+app.use(searchRoutes);
 app.use(verifyRoutes);
 
 
