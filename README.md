@@ -1,35 +1,29 @@
-# [Project Title]
+# IllumiTrust
 
 ## Team Members
-- [Name 1]
-- [Name 2]
-- [Name 3]
-- [Name 4]
-- [Name 5]
+- Adeyemi Taiwo
+- Ayobami Oludemi
+- Nwankwo Ogechukwu
+- Boluwatife Oladele
+- Zayyad Bakrin
 
 ---
 
 ## 🚀 Live Demo
 
-*   **Live Application:** [Link to your deployed Vercel/Netlify/Render URL]
-*   **Backend API:** [Link to your live backend API endpoint URL, if separate]
+*   **Live Application:** https://illumination-frontend.vercel.app
+*   **Backend API:** https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/]
 *   **Recorded Demo:** [Link to your recorded demo explaining how your solution works using Loom].
 
 
 ---
 
 ## 🎯 The Problem
-
-*Which "How Might We..." question from the challenge brief are you tackling? Show the format by providing an example below.*
-
-> **Example:** How might we help busy people organize their daily tasks more effectively?
+How can we streamline the process of knowing a customer by banks and eliminate manual address verification?
 
 ## ✨ Our Solution
 
-*Provide a short, high-level description of your project. What is your unique idea? What does it do? How does it solve the problem?*
-
-**Example:**
-"Our project, 'TaskMaster,' is a clean and simple to-do list application. It allows users to add tasks, mark them as complete, and sort them by priority. The goal is to provide a straightforward tool to help users stay organized."
+"Our project, 'IllumiTrust' is a platform that aims to reduce the stress and inconvienince experienced by cs llows users to add tasks, mark them as complete, and sort them by priority. The goal is to provide a straightforward tool to help users stay organized."
 
 ---
 
@@ -37,10 +31,10 @@
 
 *List the major technologies, frameworks, and platforms you used to build your project.*
 
-*   **Frontend:** (e.g., React, Next.js, Tailwind CSS)
-*   **Backend:** (e.g., Node.js with Serverless Functions on Vercel)
-*   **Database:** (e.g., PostgreSQL via Supabase)
-*   **Deployment:** (e.g., Vercel)
+*   **Frontend:** ReactJS, Tailwind CSS
+*   **Backend:** Node.js + expressjs
+*   **Database:** MongoDB
+*   **Deployment:** Vercel(frontend), render(backend)
 *   **AI/APIs:** (e.g., Google Gemini API)
 
 ---
@@ -53,22 +47,29 @@
 
 1.  Clone the repository:
     ```bash
-    git clone [your-repo-link]
+    git clone https://github.com/Wema-Hackaholics-Hackathon/wema-hackaholics6-0-hackathon-ui-project-team-illumination.git
     ```
 2.  Navigate to the project directory:
     ```bash
-    cd [project-directory]
+    cd wema-hackaholics6-0-hackathon-ui-project-team-illumination.git
     ```
-3.  Install dependencies:
+3.  Navigate to the frontend or backend folders:
+    ```bash
+    cd backend # for backend
+
+    # or
+    cd frontend # for frontend
+    ```
+4.  Install dependencies:
     ```bash
     npm install
     ```
-4.  Create a `.env.local` file and add the necessary environment variables:
+5.  Create a `.env.local` file and add the necessary environment variables:
     ```
     DATABASE_URL=...
     API_KEY=...
     ```
-5.  Run the development server:
+6.  Run the development server:
     ```bash
     npm run dev
     ```

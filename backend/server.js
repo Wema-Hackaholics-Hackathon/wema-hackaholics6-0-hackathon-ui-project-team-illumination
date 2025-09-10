@@ -9,13 +9,14 @@ dotenv.config()
 
 const app = express();
 app.use(cors({origin: '*'}));
+
 app.use(express.json());
-app.use(kycRoute);
 
 // Health check
 app.get("/", (_req, res) => {
   res.json({ ok: true, service: "kyc-trustscore-backend" });
 });
+app.use(kycRoute);
 
 app.use("/api/verify-address", verifyRoutes);
 

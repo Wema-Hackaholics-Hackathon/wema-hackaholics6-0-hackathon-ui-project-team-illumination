@@ -15,7 +15,7 @@ router.post("/verifykyc", async (req, res) => {
     const info = await KYCController.verifyBVN(bvn)
     res.json(info)
   } catch (e) {
-    res.status(400).json({'error': e})
+    res.status(400).json({'error': e.toString()})
     return
   }
 });
