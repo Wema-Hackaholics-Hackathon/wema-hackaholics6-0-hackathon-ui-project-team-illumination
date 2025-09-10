@@ -2,6 +2,8 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import kycRoute from "./routes/kycRoute.js";
+import verifyRoutes from "./routes/verifyRoutes.js"
+
 
 dotenv.config()
 
@@ -14,6 +16,8 @@ app.use(kycRoute);
 app.get("/", (_req, res) => {
   res.json({ ok: true, service: "kyc-trustscore-backend" });
 });
+
+app.use("/api/verify-address", verifyRoutes);
 
 
 const PORT = process.env.PORT || 5000;
