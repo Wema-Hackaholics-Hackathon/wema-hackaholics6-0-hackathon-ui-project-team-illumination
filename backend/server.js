@@ -18,7 +18,7 @@ app.get("/", (_req, res) => {
 });
 app.use(kycRoute);
 
-app.use("/api/verify-address", verifyRoutes);
+app.use(verifyRoutes);
 
 
 const PORT = process.env.PORT || 5000;
