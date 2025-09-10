@@ -30,6 +30,8 @@ export default class KYCController {
   static async verifyBVN(bvn) {
     const dummyData = _identities[bvn];
 
+    if (!dummyData) return new Error("Account doesn't exist");
+
     return dummyData;
   }
 }
