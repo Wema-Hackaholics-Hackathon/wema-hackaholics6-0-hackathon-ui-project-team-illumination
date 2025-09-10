@@ -26,6 +26,8 @@ const Verify = () => {
       const data = await response.json()
       
       if (response.ok) {
+        localStorage.setItem('userBvn', bvn)
+        localStorage.setItem('bvnData', JSON.stringify(data))
         navigate('/address', { state: { bvn, bvnData: data } })
       } else {
         setVerificationStep('form')
