@@ -8,6 +8,7 @@ const Location = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [currentPosition, setCurrentPosition] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { coordinates, addressData, searchResults } = location.state || {}
 
@@ -155,7 +156,7 @@ const Location = () => {
 
   const handleNext = async () => {
     try {
-      setIsLoading(true)
+      setIsSubmitting(true)
       
       const savedBvnData = localStorage.getItem('bvnData')
       const savedInputAddress = localStorage.getItem('inputAddress')
@@ -167,46 +168,26 @@ const Location = () => {
         ? `${inputAddressData.houseNumber} ${inputAddressData.street}, ${inputAddressData.city}, ${inputAddressData.state}`
         : ''
       
-      const extractedCoords = extractCoordinatesFromUrl(iframeUrl)
+      const currentLat = currentPosition?.lat || 0
+      const currentLng = currentPosition?.lng || 0
+      const fixedHeading = 50
       
-      let panoLat = extractedCoords.lat
-      let panoLng = extractedCoords.lng
-      let heading = extractedCoords.heading
-      
-      if (searchResults) {
-        panoLat = searchResults.lat || searchResults.panoLat || extractedCoords.lat || 0
-        panoLng = searchResults.lng || searchResults.panoLng || extractedCoords.lng || 0
-        heading = searchResults.heading || extractedCoords.heading || 0
-        
-        if (searchResults.panoData) {
-          panoLat = searchResults.panoData.lat || panoLat
-          panoLng = searchResults.panoData.lng || panoLng
-          heading = searchResults.panoData.heading || heading
-        }
-        
-        if (searchResults.location) {
-          panoLat = searchResults.location.lat || panoLat
-          panoLng = searchResults.location.lng || panoLng
-        }
-      }
-      
-      console.log('Coordinate extraction details:', {
-        iframeUrl,
-        extractedFromUrl: extractedCoords,
-        searchResults,
-        finalCoords: { panoLat, panoLng, heading }
+      console.log('Using current GPS coordinates:', {
+        currentLat,
+        currentLng,
+        currentPosition,
+        fixedHeading
       })
       
-      // Set device coordinates to match pano coordinates
       const dataToSend = {
         bvn: bvnData?.bvn || bvnData?.userBvn || '',
         inputAddress: inputAddressText,
-        deviceLat: panoLat, // Now matches panoLat
-        deviceLng: panoLng, // Now matches panoLng
+        deviceLat: currentLat,
+        deviceLng: currentLng,
         deviceAccuracy: currentPosition?.accuracy || 0,
-        panoLat: panoLat,
-        panoLng: panoLng,
-        heading: heading
+        panoLat: currentLat,
+        panoLng: currentLng,
+        heading: fixedHeading
       }
       
       console.log('Data being sent:', dataToSend)
@@ -224,13 +205,28 @@ const Location = () => {
       }
 
       const result = await response.json()
-      console.log('Verification successful:', result)
+      console.log('Verification response:', result)
+
+      // Check if verification was successful
+      if (result.success && result.record) {
+        // Navigate to success page with the verification data
+        navigate('/yes-result', { 
+          state: { 
+            verificationResult: result,
+            ...location.state 
+          } 
+        })
+      } else {
+        // Handle failed verification - stay on current page or show error
+        console.log('Verification failed or rejected:', result)
+        setError(`Verification failed: ${result.record?.result || 'Unknown error'}`)
+      }
 
     } catch (error) {
       console.error('Error submitting verification:', error)
       setError(`Verification failed: ${error.message}`)
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
@@ -255,14 +251,22 @@ const Location = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">Error Loading Street View</h2>
+          <h2 className="text-xl font-semibold text-white mb-2">Verification Error</h2>
           <p className="text-gray-400 mb-6">{error}</p>
-          <button
-            onClick={() => navigate('/address')}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded-xl"
-          >
-            Go Back
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={() => setError(null)}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded-xl transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => navigate('/address')}
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-xl transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -284,6 +288,7 @@ const Location = () => {
         referrerPolicy="no-referrer-when-downgrade"
       />
 
+      {/* Overlay with targeting frame */}
       <div className="absolute inset-0 z-10 flex items-center justify-center px-8 pointer-events-none">
         <div className="relative w-full max-w-md aspect-[4/3]">
           <div className="w-full h-full border-4 border-purple-600 rounded-lg relative">
@@ -313,6 +318,7 @@ const Location = () => {
         </div>
       </div>
 
+      {/* Back button */}
       <div className="absolute top-4 right-4 z-20">
         <button
           onClick={() => navigate('/address')}
@@ -324,6 +330,7 @@ const Location = () => {
         </button>
       </div>
 
+      {/* Action buttons */}
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
         <div className="flex items-center space-x-4">
           <button
@@ -335,18 +342,38 @@ const Location = () => {
               }
             })}
             className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-medium border border-white/30 hover:bg-white/30 transition-all duration-200"
+            disabled={isSubmitting}
           >
             Skip
           </button>
           
           <button 
             onClick={handleNext}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+            disabled={isSubmitting}
+            className="bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
           >
-            Next
+            {isSubmitting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Verifying...</span>
+              </>
+            ) : (
+              <span>Next</span>
+            )}
           </button>
         </div>
       </div>
+
+      {/* Loading overlay when submitting */}
+      {isSubmitting && (
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold text-white mb-2">Verifying Location</h2>
+            <p className="text-gray-300">Please wait while we process your verification...</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -7,6 +7,7 @@ import Address from './pages/Address'
 import Location from './pages/Location'
 import Result from './pages/Result'
 import Upload from './pages/Upload'
+import YesResult from './pages/YesResult'
 import LocationPermissionModal from './components/LocationPermissionModal'
 
 const ScrollToTop = () => {
@@ -58,6 +59,9 @@ const ProtectedRoute = ({ children, locationPermission, path }) => {
     case '/result':
       return children
 
+    case '/yes-result':
+      return children
+
     default:
       return children
   }
@@ -78,7 +82,7 @@ const FlowStatus = ({ locationPermission }) => {
       completed: false,
       current: location.pathname === '/upload' || location.pathname === '/location'
     },
-    { name: 'Result', completed: false, current: location.pathname === '/result' }
+    { name: 'Result', completed: false, current: location.pathname === '/result' || location.pathname === '/yes-result' }
   ]
 
   return (
@@ -315,6 +319,14 @@ const App = () => {
               element={
                 <ProtectedRoute locationPermission={locationPermission} path="/result">
                   <Result />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/yes-result"
+              element={
+                <ProtectedRoute locationPermission={locationPermission} path="/yes-result">
+                  <YesResult />
                 </ProtectedRoute>
               }
             />
