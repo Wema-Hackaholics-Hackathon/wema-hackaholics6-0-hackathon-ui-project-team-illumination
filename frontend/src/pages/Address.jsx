@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const Address = () => {
@@ -15,6 +15,15 @@ const Address = () => {
     city: '',
     state: ''
   })
+
+  useEffect(() => {
+    if (location.state?.skipToQuestion) {
+      setStep('question')
+      if (location.state?.addressData) {
+        setAddressData(location.state.addressData)
+      }
+    }
+  }, [location.state])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
