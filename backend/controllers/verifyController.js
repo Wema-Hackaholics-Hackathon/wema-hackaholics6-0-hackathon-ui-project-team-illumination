@@ -1,7 +1,6 @@
 import { geocodeAddress, getStreetViewImage } from "../services/googleService.js";
 import { metersBetween } from "../utils/distance.js";
 import { v4 as uuidv4 } from "uuid";
-// import { saveRecordToSheet } from "../services/googleSheetsService.js";
 
 
 
@@ -17,6 +16,8 @@ export const verifyAddress = async (req, res) => {
       panoLng,
       heading
     } = req.body;
+  
+    
 
     // 1. Geocode inputAddress
     const { lat: addressLat, lng: addressLng } = await geocodeAddress(inputAddress);
@@ -54,7 +55,6 @@ export const verifyAddress = async (req, res) => {
       createdAt: new Date()
     };
 
-    await saveRecordToSheet(record);
     res.json({ success: true, record });
   } catch (err) {
     console.error(err);

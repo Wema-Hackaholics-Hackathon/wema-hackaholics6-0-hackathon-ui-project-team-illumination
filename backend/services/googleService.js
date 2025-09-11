@@ -5,13 +5,14 @@ export const geocodeAddress = async (address) => {
     "https://maps.googleapis.com/maps/api/geocode/json",
     { params: { address, key: process.env.GOOGLE_MAPS_API_KEY } }
   );
-console.log(process.env.GOOGLE_MAPS_API_KEY);
 
   if (resp.data.status !== "OK") {
     throw new Error("Geocoding failed");
   }
 
   return resp.data.results[0].geometry.location; // { lat, lng }
+  console.log(resp.data.results[0].geometry.location);
+  
 };
 
 export const getStreetViewImage = (lat, lng, heading = 0) => {
