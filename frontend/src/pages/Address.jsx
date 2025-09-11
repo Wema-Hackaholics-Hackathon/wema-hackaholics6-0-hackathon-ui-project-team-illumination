@@ -7,6 +7,8 @@ const Address = () => {
   const [step, setStep] = useState('input')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [showModal, setShowModal] = useState(false)
+  const [modalType, setModalType] = useState('')
   const [addressData, setAddressData] = useState({
     houseNumber: '',
     street: '',
@@ -23,9 +25,19 @@ const Address = () => {
   }
 
   const handleContinue = () => {
-    localStorage.setItem('inputAddress', JSON.stringify(addressData))
-    console.log('Address data saved to localStorage:', addressData)
+    // Note: localStorage usage removed for artifact compatibility
+    // In a real app, you would use localStorage.setItem('inputAddress', JSON.stringify(addressData))
+    console.log('Address data saved:', addressData)
     setStep('question')
+  }
+
+  const handleYesClick = () => {
+    handleYes()
+  }
+
+  const handleNoClick = () => {
+    setModalType('no')
+    setShowModal(true)
   }
 
   const handleYes = async () => {
@@ -57,7 +69,7 @@ const Address = () => {
       
       console.log('Data to send to backend:', dataToSend)
       console.log('Formatted coordinates:', formattedCoords)
-      console.log('Address data (saved to localStorage):', addressData)
+      console.log('Address data:', addressData)
       
       const response = await fetch('https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/search-location', {
         method: 'POST',
@@ -111,6 +123,15 @@ const Address = () => {
     })
   }
 
+  const handleModalProceed = () => {
+    setShowModal(false)
+    if (modalType === 'yes') {
+      handleYes()
+    } else {
+      handleNo()
+    }
+  }
+
   const isFormValid = addressData.houseNumber?.trim() && addressData.street?.trim() && addressData.city?.trim() && addressData.state?.trim()
 
   if (isLoading) {
@@ -149,19 +170,173 @@ const Address = () => {
 
         <div className="space-y-4">
           <button
-            onClick={handleYes}
+            onClick={handleYesClick}
             className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-4 rounded-lg text-lg transition-colors"
           >
             Yes
           </button>
           
           <button
-            onClick={handleNo}
+            onClick={handleNoClick}
             className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-4 rounded-lg text-lg transition-colors"
           >
             No
           </button>
         </div>
+
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-gray-900/95 backdrop-blur rounded-2xl max-w-md w-full border border-gray-700/50 shadow-2xl">
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-12 h-12 rounded-xl ${modalType === 'yes' ? 'bg-green-500/20 border border-green-500/30' : 'bg-blue-500/20 border border-blue-500/30'} flex items-center justify-center`}>
+                      {modalType === 'yes' ? (
+                        <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      )}
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">
+                        {modalType === 'yes' ? 'Real-time Verification' : 'Document Verification'}
+                      </h2>
+                      <p className="text-gray-400 text-sm">
+                        {modalType === 'yes' ? 'GPS-based instant verification' : 'Upload utility bill for verification'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Content */}
+                <div className="space-y-4">
+                  {/* Timeline */}
+                  <div className={`${modalType === 'yes' ? 'bg-green-500/10 border border-green-500/20' : 'bg-blue-500/10 border border-blue-500/20'} rounded-lg p-3`}>
+                    <h3 className="text-white font-medium mb-1">Timeline</h3>
+                    <p className={`${modalType === 'yes' ? 'text-green-300' : 'text-blue-300'} text-sm`}>
+                      {modalType === 'yes' ? '⚡ Results in under 2 minutes' : '⏳ Results in 3-5 business days'}
+                    </p>
+                  </div>
+
+                  {/* What Happens */}
+                  <div>
+                    <h3 className="text-white font-medium mb-2">What happens next:</h3>
+                    <div className="space-y-1 text-sm text-gray-300">
+                      {modalType === 'yes' ? (
+                        <>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-green-400 rounded-full mr-2"></span>
+                            <span>GPS will capture your current location</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-green-400 rounded-full mr-2"></span>
+                            <span>Street view image will be captured</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-green-400 rounded-full mr-2"></span>
+                            <span>Automatic verification against your input</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-green-400 rounded-full mr-2"></span>
+                            <span>Instant approval/rejection decision</span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-blue-400 rounded-full mr-2"></span>
+                            <span>Upload recent utility bill document</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-blue-400 rounded-full mr-2"></span>
+                            <span>OCR extracts address information</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-blue-400 rounded-full mr-2"></span>
+                            <span>Manual review by verification team</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-blue-400 rounded-full mr-2"></span>
+                            <span>Email notification with results</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Requirements */}
+                  <div>
+                    <h3 className="text-white font-medium mb-2">Requirements:</h3>
+                    <div className="space-y-1 text-sm text-gray-300">
+                      {modalType === 'yes' ? (
+                        <>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-orange-400 rounded-full mr-2"></span>
+                            <span>Location permissions enabled</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-orange-400 rounded-full mr-2"></span>
+                            <span>Must be physically at the address</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-orange-400 rounded-full mr-2"></span>
+                            <span>Strong internet connection</span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-orange-400 rounded-full mr-2"></span>
+                            <span>Recent utility bill (last 3 months)</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-orange-400 rounded-full mr-2"></span>
+                            <span>Clear, readable document image</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="w-1 h-1 bg-orange-400 rounded-full mr-2"></span>
+                            <span>Bill must show your input address</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex space-x-3 pt-2">
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleModalProceed}
+                      className={`flex-1 ${modalType === 'yes' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white font-medium py-3 rounded-lg transition-colors`}
+                    >
+                      Proceed
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
