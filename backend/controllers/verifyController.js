@@ -1,6 +1,9 @@
 import { geocodeAddress, getStreetViewImage } from "../services/googleService.js";
 import { metersBetween } from "../utils/distance.js";
 import { v4 as uuidv4 } from "uuid";
+// import { saveRecordToSheet } from "../services/googleSheetsService.js";
+
+
 
 export const verifyAddress = async (req, res) => {
   try {
@@ -26,9 +29,9 @@ export const verifyAddress = async (req, res) => {
 
     // 4. Decide result (simple rule)
     let result = "pending";
-    if (distance <= 50 && deviceAccuracy <= 50) {
+    if (distance <= 500 && deviceAccuracy <= 50) {
       result = "approved";
-    } else if (distance > 200) {
+    } else if (distance > 1000) {
       result = "rejected";
     }
 
@@ -51,6 +54,7 @@ export const verifyAddress = async (req, res) => {
       createdAt: new Date()
     };
 
+    await saveRecordToSheet(record);
     res.json({ success: true, record });
   } catch (err) {
     console.error(err);
