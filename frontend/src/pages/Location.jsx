@@ -350,35 +350,35 @@ const Location = () => {
         </button>
       </div>
 
-      <div className="fixed inset-x-0 top-1/2 transform -translate-y-1/2 z-30 px-4">
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-sm px-4">
         {capturedImage ? (
-          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm mx-auto border border-gray-200">
-            <h3 className="text-gray-800 font-semibold mb-4 text-center">Location Captured</h3>
+          <div className="bg-white rounded-lg p-4 shadow-xl">
+            <h3 className="text-gray-800 font-medium mb-3">Location Captured</h3>
             
             {capturedImage.includes('Sorry, we have no imagery here') || capturedImage.includes('streetview') ? (
-              <div className="w-full h-32 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg mb-4 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
-                <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-full h-48 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg mb-3 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
+                <svg className="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <p className="text-gray-600 text-sm text-center font-medium">Location Verified</p>
-                <p className="text-gray-500 text-xs text-center mt-1">Street view not available</p>
+                <p className="text-gray-500 text-xs text-center mt-1">Street view not available for this area</p>
               </div>
             ) : (
               <img 
                 src={capturedImage} 
                 alt="Captured street view" 
-                className="w-full h-32 object-cover rounded-lg mb-4"
+                className="w-full rounded-lg mb-3"
               />
             )}
             
-            <p className="text-gray-600 text-xs mb-4 text-center">
-              Location successfully captured for verification
+            <p className="text-gray-600 text-xs mb-3">
+              Your location has been successfully captured for verification
             </p>
             
             {buttonError && (
-              <div className="mb-4">
-                <p className="text-red-600 text-xs bg-red-50 px-3 py-2 rounded-lg text-center">
+              <div className="mb-3">
+                <p className="text-red-600 text-xs bg-red-50 px-2 py-1 rounded">
                   {buttonError}
                 </p>
               </div>
@@ -387,11 +387,11 @@ const Location = () => {
             <button
               onClick={handleVerifyAddress}
               disabled={isVerifying}
-              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold px-6 py-4 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200"
+              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium px-6 py-3 rounded-lg flex items-center justify-center space-x-2"
             >
               {isVerifying ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Verifying...</span>
                 </>
               ) : (
@@ -400,39 +400,36 @@ const Location = () => {
             </button>
           </div>
         ) : (
-          <div className="max-w-sm mx-auto">
-            <div className="bg-white rounded-2xl p-6 shadow-2xl border border-gray-200">
-              <div className="text-center mb-4">
-                <h3 className="text-gray-800 font-semibold mb-2">Confirm Location</h3>
-                <p className="text-gray-600 text-sm">
-                  Have you found your house on the map?
+          <>
+            <div className="mb-2">
+              <p className="text-white text-xs bg-black/60 backdrop-blur px-3 py-1 rounded-md text-center">
+                Have you seen your house?
+              </p>
+            </div>
+            
+            {buttonError && (
+              <div className="mb-2">
+                <p className="text-red-400 text-xs bg-red-900/60 px-2 py-1 rounded text-center">
+                  {buttonError}
                 </p>
               </div>
-              
-              {buttonError && (
-                <div className="mb-4">
-                  <p className="text-red-600 text-xs bg-red-50 px-3 py-2 rounded-lg text-center">
-                    {buttonError}
-                  </p>
-                </div>
+            )}
+            
+            <button
+              onClick={handleConfirmLocation}
+              disabled={isConfirming}
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white text-sm px-6 py-2 rounded-lg flex items-center space-x-2 mx-auto"
+            >
+              {isConfirming ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Confirming...</span>
+                </>
+              ) : (
+                <span>Continue</span>
               )}
-              
-              <button
-                onClick={handleConfirmLocation}
-                disabled={isConfirming}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold px-6 py-4 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200"
-              >
-                {isConfirming ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Confirming...</span>
-                  </>
-                ) : (
-                  <span>Continue</span>
-                )}
-              </button>
-            </div>
-          </div>
+            </button>
+          </>
         )}
       </div>
     </div>
