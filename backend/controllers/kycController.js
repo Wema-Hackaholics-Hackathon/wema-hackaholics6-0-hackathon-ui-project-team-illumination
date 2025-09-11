@@ -27,7 +27,7 @@ const _identities = [
   }
 ]
 export default class KYCController {
-  static async verifyBVN (bvn) {
+  static async verifyBVNDemo (bvn) {
     const dummyData = _identities.find((k) => k.bvn === bvn)
     if (!dummyData) {
       throw new Error('Unable to validate account')
@@ -36,13 +36,15 @@ export default class KYCController {
     return dummyData
   }
 
-  static async verifyBVNLive (bvn) {
+  static async verifyBVN (bvn) {
+    console.log(process.env.PREMBLY_API_KEY, process.env.PREMBLY_APP_ID)
     const resp = await fetch(
       `${process.env.PREMBLY_BASE_URL}/verification/bvn`,
       {
         method: 'POST',
         body: JSON.stringify({ number: bvn }),
         headers: {
+          'content-type': 'application/json',
           'x-api-key': process.env.PREMBLY_API_KEY,
           'app-id': process.env.PREMBLY_APP_ID
         }
