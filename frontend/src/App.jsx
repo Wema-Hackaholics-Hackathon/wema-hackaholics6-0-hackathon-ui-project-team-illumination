@@ -9,6 +9,16 @@ import Result from './pages/Result'
 import Upload from './pages/Upload'
 import LocationPermissionModal from './components/LocationPermissionModal'
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+}
+
 const ProtectedRoute = ({ children, locationPermission, path }) => {
   const location = useLocation()
   const currentPath = location.pathname
@@ -109,7 +119,7 @@ const FlowStatus = ({ locationPermission }) => {
   )
 }
 
-const ConditionalLayout = ({ children, locationPermission }) => {
+const ConditionalLayout = ({ children, locationPermission, setShowLocationModal }) => {
   const location = useLocation()
   const isLocationPage = location.pathname === '/location'
 
@@ -254,7 +264,11 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[#0C0517] text-gray-200">
-        <ConditionalLayout locationPermission={locationPermission}>
+        <ScrollToTop />
+        <ConditionalLayout 
+          locationPermission={locationPermission}
+          setShowLocationModal={setShowLocationModal}
+        >
           <Routes>
             <Route
               path="/"

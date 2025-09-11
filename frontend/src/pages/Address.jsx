@@ -25,8 +25,7 @@ const Address = () => {
   }
 
   const handleContinue = () => {
-    // Note: localStorage usage removed for artifact compatibility
-    // In a real app, you would use localStorage.setItem('inputAddress', JSON.stringify(addressData))
+    localStorage.setItem('inputAddress', JSON.stringify(addressData))
     console.log('Address data saved:', addressData)
     setStep('question')
   }
