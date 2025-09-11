@@ -30,45 +30,43 @@ const Upload = () => {
 
     try {
       const formData = new FormData()
-      formData.append('utilityBill', selectedFile)
+      formData.append('file', selectedFile)
 
-      console.log('Uploading file:', selectedFile.name)
-      console.log('File size:', selectedFile.size)
-      console.log('File type:', selectedFile.type)
-
-      const response = await fetch('https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/upload-utility-bill', {
+      const response = await fetch('https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/upload', {
         method: 'POST',
         body: formData
       })
+
+      const responseText = await response.text()
 
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.status}`)
       }
 
-      const data = await response.json()
-      console.log('Upload response:', data)
+      let data
+      try {
+        data = JSON.parse(responseText)
+      } catch (parseError) {
+        data = { message: responseText }
+      }
 
+      localStorage.setItem('ocrResponse', JSON.stringify(data))
       setUploadStep('success')
       setIsUploading(false)
 
     } catch (error) {
-      console.error('Upload error:', error)
       setError(`Upload failed: ${error.message}`)
       setIsUploading(false)
     }
   }
 
-  const handleTryAgain = () => {
-    navigate('/address', { 
-      state: { 
-        ...location.state
-      }
-    })
+  const handleContinueToResults = () => {
+    navigate('/result?status=no')
   }
 
   if (uploadStep === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 pt-8">
         <div className="w-full max-w-md">
           <div className="text-center space-y-8">
             <div className="space-y-4">
@@ -99,14 +97,14 @@ const Upload = () => {
 
             <div className="space-y-3">
               <button
-                onClick={handleTryAgain}
+                onClick={handleContinueToResults}
                 className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-4 rounded-xl transition-all duration-200 shadow-lg"
               >
-                Try Location Verification Instead
+                Continue to Results
               </button>
               
               <p className="text-gray-500 text-sm">
-                Go to your address for instant verification
+                View your verification results and extracted information
               </p>
             </div>
           </div>
@@ -116,9 +114,9 @@ const Upload = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 pt-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-white mb-2">Document Upload</h1>
           <p className="text-gray-400">Upload your recent utility bill</p>
         </div>

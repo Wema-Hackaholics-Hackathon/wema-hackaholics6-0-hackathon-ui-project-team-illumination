@@ -23,6 +23,8 @@ const Address = () => {
   }
 
   const handleContinue = () => {
+    localStorage.setItem('inputAddress', JSON.stringify(addressData))
+    console.log('Address data saved to localStorage:', addressData)
     setStep('question')
   }
 
@@ -55,7 +57,7 @@ const Address = () => {
       
       console.log('Data to send to backend:', dataToSend)
       console.log('Formatted coordinates:', formattedCoords)
-      console.log('Address data (not sent to backend):', addressData)
+      console.log('Address data (saved to localStorage):', addressData)
       
       const response = await fetch('https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/search-location', {
         method: 'POST',
@@ -111,6 +113,19 @@ const Address = () => {
 
   const isFormValid = addressData.houseNumber?.trim() && addressData.street?.trim() && addressData.city?.trim() && addressData.state?.trim()
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0C0517]">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-white mb-2">Getting Your Location</h2>
+          <p className="text-gray-400">Please wait while we search for your address...</p>
+          <p className="text-gray-500 text-sm mt-2">This may take a few seconds</p>
+        </div>
+      </div>
+    )
+  }
+
   if (step === 'question') {
     return (
       <div className="max-w-lg mx-auto">
@@ -135,23 +150,14 @@ const Address = () => {
         <div className="space-y-4">
           <button
             onClick={handleYes}
-            disabled={isLoading}
-            className="w-full bg-[#A350B6] hover:bg-[#8A42A1] disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-lg text-lg transition-colors"
+            className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-4 rounded-lg text-lg transition-colors"
           >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                Getting location and searching...
-              </div>
-            ) : (
-              'Yes'
-            )}
+            Yes
           </button>
           
           <button
             onClick={handleNo}
-            disabled={isLoading}
-            className="w-full bg-[#A350B6] hover:bg-[#8A42A1] disabled:bg-gray-600 text-white font-semibold py-4 rounded-lg text-lg transition-colors"
+            className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-4 rounded-lg text-lg transition-colors"
           >
             No
           </button>
