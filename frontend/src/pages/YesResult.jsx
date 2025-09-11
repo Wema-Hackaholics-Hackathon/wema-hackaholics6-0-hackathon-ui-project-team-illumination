@@ -13,13 +13,13 @@ const YesResult = () => {
       setVerificationData(location.state.verificationResult)
     }
     
-    const savedBvnData = sessionStorage.getItem('bvnData')
+    const savedBvnData = localStorage.getItem('bvnData')
     if (savedBvnData) {
       const parsed = JSON.parse(savedBvnData)
       setBvnData(parsed)
     }
 
-    const savedInputAddress = sessionStorage.getItem('inputAddress')
+    const savedInputAddress = localStorage.getItem('inputAddress')
     if (savedInputAddress) {
       const parsed = JSON.parse(savedInputAddress)
       setInputAddress(parsed)
@@ -64,14 +64,14 @@ const YesResult = () => {
     } else if (result === 'rejected' || distance > 1000) {
       return {
         status: 'rejected',
-        message: 'Verification failed. Your location does not match the provided address',
+        message: 'Verification failed. Please try again',
         color: 'red',
         icon: 'M6 18L18 6M6 6l12 12'
       }
     } else {
       return {
         status: 'pending',
-        message: 'Verification is under review. Please wait for manual approval',
+        message: 'Verification pending. Please wait for review',
         color: 'yellow',
         icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
       }
@@ -80,123 +80,86 @@ const YesResult = () => {
 
   const status = getVerificationStatus()
 
+  // For rejected and pending, show minimal UI
+  if (status.status === 'rejected' || status.status === 'pending') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className={`bg-gradient-to-r ${
+          status.color === 'red'
+            ? 'from-red-800/80 to-red-900/80 border-red-700/50'
+            : 'from-yellow-800/80 to-yellow-900/80 border-yellow-700/50'
+        } backdrop-blur-sm border-b`}>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+            <div className="text-center">
+              <div className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 ${
+                status.color === 'red'
+                  ? 'bg-red-500/20 border-red-500/30'
+                  : 'bg-yellow-500/20 border-yellow-500/30'
+              } backdrop-blur-sm rounded-full mb-4 border`}>
+                <svg className={`w-8 h-8 sm:w-10 sm:h-10 ${
+                  status.color === 'red'
+                    ? 'text-red-400'
+                    : 'text-yellow-400'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={status.icon} />
+                </svg>
+              </div>
+              
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                {status.status === 'rejected' ? 'Verification Failed' : 'Verification Pending'}
+              </h1>
+              <p className={`text-sm sm:text-base ${
+                status.color === 'red'
+                  ? 'text-red-200'
+                  : 'text-yellow-200'
+              }`}>
+                {status.message}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+          <div className="text-center">
+            <button
+              onClick={handleStartNew}
+              className={`bg-gradient-to-r ${
+                status.color === 'red'
+                  ? 'from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
+                  : 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+              } text-white font-medium py-3 px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5`}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // For approved, show full details
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Header Section */}
-      <div className={`bg-gradient-to-r ${
-        status.color === 'green' 
-          ? 'from-green-800/80 to-green-900/80 border-green-700/50' 
-          : status.color === 'red'
-          ? 'from-red-800/80 to-red-900/80 border-red-700/50'
-          : 'from-yellow-800/80 to-yellow-900/80 border-yellow-700/50'
-      } backdrop-blur-sm border-b`}>
+      <div className="bg-gradient-to-r from-green-800/80 to-green-900/80 border-green-700/50 backdrop-blur-sm border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="text-center">
-            <div className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 ${
-              status.color === 'green' 
-                ? 'bg-green-500/20 border-green-500/30' 
-                : status.color === 'red'
-                ? 'bg-red-500/20 border-red-500/30'
-                : 'bg-yellow-500/20 border-yellow-500/30'
-            } backdrop-blur-sm rounded-full mb-4 border`}>
-              <svg className={`w-8 h-8 sm:w-10 sm:h-10 ${
-                status.color === 'green' 
-                  ? 'text-green-400' 
-                  : status.color === 'red'
-                  ? 'text-red-400'
-                  : 'text-yellow-400'
-              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-green-500/20 border-green-500/30 backdrop-blur-sm rounded-full mb-4 border">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={status.icon} />
               </svg>
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-              {status.status === 'approved' ? 'Verification Successful!' : 
-               status.status === 'rejected' ? 'Verification Failed' : 
-               'Verification Pending'}
+              Verification Successful!
             </h1>
-            <p className={`text-sm sm:text-base ${
-              status.color === 'green' 
-                ? 'text-green-200' 
-                : status.color === 'red'
-                ? 'text-red-200'
-                : 'text-yellow-200'
-            }`}>
+            <p className="text-sm sm:text-base text-green-200">
               {status.message}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Status Alert */}
-        <div className={`bg-gradient-to-r ${
-          status.color === 'green' 
-            ? 'from-green-500/10 to-emerald-500/10 border-green-500/30' 
-            : status.color === 'red'
-            ? 'from-red-500/10 to-red-600/10 border-red-500/30'
-            : 'from-yellow-500/10 to-yellow-600/10 border-yellow-500/30'
-        } border rounded-lg sm:rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm`}>
-          <div className="flex items-start space-x-3 sm:space-x-4">
-            <div className={`w-10 h-10 sm:w-12 sm:h-12 ${
-              status.color === 'green' 
-                ? 'bg-green-500/20' 
-                : status.color === 'red'
-                ? 'bg-red-500/20'
-                : 'bg-yellow-500/20'
-            } rounded-lg flex items-center justify-center flex-shrink-0`}>
-              <svg className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                status.color === 'green' 
-                  ? 'text-green-400' 
-                  : status.color === 'red'
-                  ? 'text-red-400'
-                  : 'text-yellow-400'
-              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={status.icon} />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className={`text-base sm:text-lg font-semibold ${
-                status.color === 'green' 
-                  ? 'text-green-300' 
-                  : status.color === 'red'
-                  ? 'text-red-300'
-                  : 'text-yellow-300'
-              } mb-1 sm:mb-2`}>
-                {status.status === 'approved' ? 'Verification Complete' : 
-                 status.status === 'rejected' ? 'Verification Failed' : 
-                 'Under Review'}
-              </h3>
-              <p className={`text-sm sm:text-base ${
-                status.color === 'green' 
-                  ? 'text-green-200' 
-                  : status.color === 'red'
-                  ? 'text-red-200'
-                  : 'text-yellow-200'
-              } leading-relaxed`}>
-                {status.status === 'approved' 
-                  ? 'Your location matches the provided address. All verification steps have been completed successfully.'
-                  : status.status === 'rejected'
-                  ? 'Your current location is too far from the provided address. Please ensure you are at the correct location and try again.'
-                  : 'Your verification is being reviewed manually. You will be notified once the review is complete.'
-                }
-              </p>
-              
-              {status.status === 'rejected' && verificationData?.record && (
-                <div className="mt-3 text-sm text-red-300">
-                  <p>• Distance from address: {formatDistance(verificationData.record.distance)}</p>
-                  <p>• GPS accuracy: {formatAccuracy(verificationData.record.deviceAccuracy)}</p>
-                  <p className="mt-1 text-red-400 font-medium">
-                    Required: Within 500m with GPS accuracy ±50m
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Verification Details */}
         {verificationData && (
           <div className="bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-xl mb-6 sm:mb-8">
             <div className="flex items-center space-x-3 mb-4 sm:mb-6">
@@ -209,55 +172,23 @@ const YesResult = () => {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className={`${
-                status.color === 'green' 
-                  ? 'bg-green-500/10 border-green-500/30' 
-                  : status.color === 'red'
-                  ? 'bg-red-500/10 border-red-500/30'
-                  : 'bg-yellow-500/10 border-yellow-500/30'
-              } border rounded-lg p-4`}>
+              <div className="bg-green-500/10 border-green-500/30 border rounded-lg p-4">
                 <div className="flex items-center space-x-2 mb-2">
-                  <div className={`w-6 h-6 ${
-                    status.color === 'green' 
-                      ? 'bg-green-500/20' 
-                      : status.color === 'red'
-                      ? 'bg-red-500/20'
-                      : 'bg-yellow-500/20'
-                  } rounded-full flex items-center justify-center`}>
-                    <svg className={`w-3 h-3 ${
-                      status.color === 'green' 
-                        ? 'text-green-400' 
-                        : status.color === 'red'
-                        ? 'text-red-400'
-                        : 'text-yellow-400'
-                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={status.icon} />
                     </svg>
                   </div>
-                  <label className={`text-xs font-medium ${
-                    status.color === 'green' 
-                      ? 'text-green-400' 
-                      : status.color === 'red'
-                      ? 'text-red-400'
-                      : 'text-yellow-400'
-                  } uppercase tracking-wider`}>Status</label>
+                  <label className="text-xs font-medium text-green-400 uppercase tracking-wider">Status</label>
                 </div>
-                <p className={`text-lg font-semibold ${
-                  status.color === 'green' 
-                    ? 'text-green-300' 
-                    : status.color === 'red'
-                    ? 'text-red-300'
-                    : 'text-yellow-300'
-                } capitalize`}>
+                <p className="text-lg font-semibold text-green-300 capitalize">
                   {verificationData.record?.result || status.status}
                 </p>
               </div>
 
               <div className="bg-gray-700/30 rounded-lg p-4">
                 <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">Distance</label>
-                <p className={`text-sm sm:text-base font-medium ${
-                  verificationData.record?.distance <= 500 ? 'text-green-300' : 'text-red-300'
-                }`}>
+                <p className="text-sm sm:text-base font-medium text-green-300">
                   {formatDistance(verificationData.record?.distance)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Required: ≤ 500m</p>
@@ -265,9 +196,7 @@ const YesResult = () => {
 
               <div className="bg-gray-700/30 rounded-lg p-4">
                 <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">GPS Accuracy</label>
-                <p className={`text-sm sm:text-base font-medium ${
-                  verificationData.record?.deviceAccuracy <= 50 ? 'text-green-300' : 'text-red-300'
-                }`}>
+                <p className="text-sm sm:text-base font-medium text-green-300">
                   {formatAccuracy(verificationData.record?.deviceAccuracy)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Required: ±50m</p>
@@ -294,29 +223,10 @@ const YesResult = () => {
                 </p>
               </div>
             </div>
-
-            {verificationData.record?.imageUrl && (
-              <div className="mt-6">
-                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3 block">Street View Capture</label>
-                <div className="bg-gray-700/30 rounded-lg p-4">
-                  <img 
-                    src={verificationData.record.imageUrl}
-                    alt="Street View Verification"
-                    className="w-full max-w-2xl mx-auto rounded-lg border border-gray-600/50"
-                    onError={(e) => {
-                      e.target.style.display = 'none'
-                      e.target.parentNode.innerHTML = '<div class="text-center py-8"><p class="text-gray-400">Street view image not available</p></div>'
-                    }}
-                  />
-                </div>
-              </div>
-            )}
           </div>
         )}
 
-        {/* BVN and Address Information */}
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8">
-          {/* BVN Information */}
           <div className="lg:col-span-1">
             <div className="bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-xl">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
@@ -344,13 +254,7 @@ const YesResult = () => {
                             }}
                           />
                         </div>
-                        <div className={`absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 ${
-                          status.color === 'green' 
-                            ? 'bg-green-500' 
-                            : status.color === 'red'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
-                        } rounded-full border-2 border-gray-800 flex items-center justify-center`}>
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
                           <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={status.icon} />
                           </svg>
@@ -394,65 +298,38 @@ const YesResult = () => {
             </div>
           </div>
 
-          {/* Address Information */}
           <div className="lg:col-span-1">
             <div className="bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-xl">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                <div className={`w-8 h-8 sm:w-10 sm:h-10 ${
-                  status.color === 'green' 
-                    ? 'bg-green-500/20' 
-                    : status.color === 'red'
-                    ? 'bg-red-500/20'
-                    : 'bg-yellow-500/20'
-                } rounded-lg flex items-center justify-center`}>
-                  <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                    status.color === 'green' 
-                      ? 'text-green-400' 
-                      : status.color === 'red'
-                      ? 'text-red-400'
-                      : 'text-yellow-400'
-                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white">
-                  {status.status === 'approved' ? 'Verified Address' : 'Provided Address'}
-                </h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-white">Verified Address</h3>
               </div>
               
               {inputAddress ? (
-                <div className={`${
-                  status.color === 'green' 
-                    ? 'bg-green-500/10 border-green-500/30' 
-                    : 'bg-gray-700/30 border-gray-600/30'
-                } border rounded-lg p-3 sm:p-4`}>
+                <div className="bg-green-500/10 border-green-500/30 border rounded-lg p-3 sm:p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className={`text-xs font-medium ${
-                        status.color === 'green' ? 'text-green-400' : 'text-gray-400'
-                      } uppercase tracking-wider`}>House Number</label>
+                      <label className="text-xs font-medium text-green-400 uppercase tracking-wider">House Number</label>
                       <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.houseNumber || 'N/A'}</p>
                     </div>
                     
                     <div>
-                      <label className={`text-xs font-medium ${
-                        status.color === 'green' ? 'text-green-400' : 'text-gray-400'
-                      } uppercase tracking-wider`}>City</label>
+                      <label className="text-xs font-medium text-green-400 uppercase tracking-wider">City</label>
                       <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.city || 'N/A'}</p>
                     </div>
                     
                     <div className="sm:col-span-2">
-                      <label className={`text-xs font-medium ${
-                        status.color === 'green' ? 'text-green-400' : 'text-gray-400'
-                      } uppercase tracking-wider`}>Street</label>
+                      <label className="text-xs font-medium text-green-400 uppercase tracking-wider">Street</label>
                       <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.street || 'N/A'}</p>
                     </div>
                     
                     <div>
-                      <label className={`text-xs font-medium ${
-                        status.color === 'green' ? 'text-green-400' : 'text-gray-400'
-                      } uppercase tracking-wider`}>State</label>
+                      <label className="text-xs font-medium text-green-400 uppercase tracking-wider">State</label>
                       <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.state || 'N/A'}</p>
                     </div>
                   </div>
@@ -471,50 +348,13 @@ const YesResult = () => {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="text-center mt-8 sm:mt-12 pb-6 sm:pb-8">
           <button
             onClick={handleStartNew}
-            className={`bg-gradient-to-r ${
-              status.color === 'green' 
-                ? 'from-green-600 to-green-700 hover:from-green-700 hover:to-green-800' 
-                : status.color === 'red'
-                ? 'from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
-                : 'from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800'
-            } text-white font-medium py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base`}
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base"
           >
-            {status.status === 'approved' ? 'Start New Verification' : 'Try Again'}
+            Start New Verification
           </button>
-          
-          <div className="mt-6 sm:mt-8 px-4">
-            <p className={`text-sm sm:text-base leading-relaxed max-w-2xl mx-auto ${
-              status.color === 'green' 
-                ? 'text-gray-300' 
-                : status.color === 'red'
-                ? 'text-red-200'
-                : 'text-yellow-200'
-            }`}>
-              {status.status === 'approved' ? (
-                <>
-                  🎉 Congratulations! Your identity and address verification is complete.
-                  <br className="hidden sm:block" />
-                  You can now proceed with your account setup or other services.
-                </>
-              ) : status.status === 'rejected' ? (
-                <>
-                  ❌ Verification failed. Please ensure you are at the correct address location and try again.
-                  <br className="hidden sm:block" />
-                  Make sure your GPS is enabled and you have a strong signal.
-                </>
-              ) : (
-                <>
-                  ⏳ Your verification is being reviewed. You will receive an update once the review is complete.
-                  <br className="hidden sm:block" />
-                  This usually takes 1-2 business days.
-                </>
-              )}
-            </p>
-          </div>
         </div>
       </div>
     </div>
