@@ -223,6 +223,23 @@ const YesResult = () => {
                 </p>
               </div>
             </div>
+
+            {verificationData.record?.imageUrl && (
+              <div className="mt-6">
+                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3 block">Street View Verification</label>
+                <div className="bg-gray-700/30 rounded-lg p-4">
+                  <img 
+                    src={verificationData.record.imageUrl}
+                    alt="Street View Verification"
+                    className="w-full max-w-2xl mx-auto rounded-lg border border-gray-600/50"
+                    onError={(e) => {
+                      e.target.style.display = 'none'
+                      e.target.parentNode.innerHTML = '<div class="text-center py-8"><p class="text-gray-400">Street view image not available</p></div>'
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -346,15 +363,6 @@ const YesResult = () => {
               )}
             </div>
           </div>
-        </div>
-
-        <div className="text-center mt-8 sm:mt-12 pb-6 sm:pb-8">
-          <button
-            onClick={handleStartNew}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base"
-          >
-            Start New Verification
-          </button>
         </div>
       </div>
     </div>

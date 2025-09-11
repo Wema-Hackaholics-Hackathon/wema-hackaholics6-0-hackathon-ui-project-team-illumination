@@ -73,13 +73,6 @@ const Result = () => {
 
   const billInfo = ocrData ? extractImportantInfo(ocrData) : {}
 
-  const handleStartNew = () => {
-    localStorage.removeItem('bvnData')
-    localStorage.removeItem('inputAddress')
-    localStorage.removeItem('ocrResponse')
-    window.location.href = '/'
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       {/* Header - Mobile Responsive */}
@@ -314,16 +307,9 @@ const Result = () => {
           </div>
         </div>
 
-        {/* Footer Section - Mobile Responsive */}
+        {/* Footer Information - No Button */}
         <div className="text-center mt-8 sm:mt-12 pb-6 sm:pb-8">
-          <button
-            onClick={handleStartNew}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base"
-          >
-            Start New Verification
-          </button>
-          
-          <div className="mt-6 sm:mt-8 px-4">
+          <div className="px-4">
             <p className="text-sm sm:text-base text-gray-400 leading-relaxed max-w-2xl mx-auto">
               Your information is securely stored and will be reviewed by our team.
               <br className="hidden sm:block" />
