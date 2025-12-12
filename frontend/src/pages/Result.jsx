@@ -6,24 +6,25 @@ const Result = () => {
   const [bvnData, setBvnData] = useState(null)
   const [inputAddress, setInputAddress] = useState(null)
   const [ocrData, setOcrData] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Check if user came via document upload (has OCR data) or GPS verification
   const isDocumentVerification = ocrData !== null
 
   useEffect(() => {
-    console.log('Loading data from localStorage...')
+    // Simulate brief loading for smooth transition
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 500)
 
     const savedBvnData = localStorage.getItem('bvnData')
     if (savedBvnData) {
       try {
         const parsed = JSON.parse(savedBvnData)
         setBvnData(parsed)
-        console.log('BVN Data loaded:', parsed)
       } catch (e) {
         console.error('Error parsing BVN data:', e)
       }
-    } else {
-      console.log('No BVN data found')
     }
 
     const savedInputAddress = localStorage.getItem('inputAddress')
@@ -31,12 +32,9 @@ const Result = () => {
       try {
         const parsed = JSON.parse(savedInputAddress)
         setInputAddress(parsed)
-        console.log('Input Address loaded:', parsed)
       } catch (e) {
         console.error('Error parsing input address:', e)
       }
-    } else {
-      console.log('No inputAddress found')
     }
 
     const savedOcrData = localStorage.getItem('ocrResponse')
@@ -44,13 +42,12 @@ const Result = () => {
       try {
         const parsed = JSON.parse(savedOcrData)
         setOcrData(parsed)
-        console.log('OCR Data loaded:', parsed)
       } catch (e) {
         console.error('Error parsing OCR data:', e)
       }
-    } else {
-      console.log('No OCR data found')
     }
+
+    return () => clearTimeout(timer)
   }, [])
 
   const extractImportantInfo = (ocrResponse) => {
@@ -96,6 +93,63 @@ const Result = () => {
     localStorage.removeItem('ocrResponse')
     localStorage.removeItem('userBvn')
     navigate('/verify')
+  }
+
+  const handleGoHome = () => {
+    navigate('/')
+  }
+
+  // Loading state with smooth spinner
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-gray-700 rounded-full"></div>
+            <div className="w-16 h-16 border-4 border-[#A350B6] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+          <p className="text-gray-400 mt-4 text-sm">Loading verification results...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // No data state - improved empty state
+  if (!bvnData && !inputAddress && !ocrData) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-800/50 rounded-full mb-6 border border-gray-700">
+            <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">No Verification Data</h2>
+          <p className="text-gray-400 mb-8 max-w-sm mx-auto">
+            It looks like you haven't completed a verification yet. Start a new verification to see your results here.
+          </p>
+
+          <div className="space-y-3 max-w-xs mx-auto">
+            <button
+              onClick={handleStartNew}
+              className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            >
+              Start Verification
+            </button>
+            <button
+              onClick={handleGoHome}
+              className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-3 px-6 rounded-lg transition-colors border border-gray-700"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-gray-500 mt-8">
+          Powered by IllumiTrust • Secure KYC Verification
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -261,25 +315,21 @@ const Result = () => {
         </div>
       )}
 
-      {/* No Data State */}
-      {!bvnData && !inputAddress && !ocrData && (
-        <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-8 text-center mb-6">
-          <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-          </div>
-          <p className="text-gray-400 text-sm">No verification data found</p>
-        </div>
-      )}
-
-      {/* Action Button */}
-      <button
-        onClick={handleStartNew}
-        className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-      >
-        Start New Verification
-      </button>
+      {/* Action Buttons */}
+      <div className="space-y-3">
+        <button
+          onClick={handleStartNew}
+          className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+        >
+          Start New Verification
+        </button>
+        <button
+          onClick={handleGoHome}
+          className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-3 px-6 rounded-lg transition-colors border border-gray-700"
+        >
+          Back to Home
+        </button>
+      </div>
 
       {/* Footer */}
       <p className="text-center text-xs text-gray-500 mt-6">
