@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Result = () => {
+  const navigate = useNavigate()
   const [bvnData, setBvnData] = useState(null)
   const [inputAddress, setInputAddress] = useState(null)
   const [ocrData, setOcrData] = useState(null)
@@ -53,34 +55,34 @@ const Result = () => {
 
   const extractImportantInfo = (ocrResponse) => {
     if (!ocrResponse?.text?.[0]) return {}
-    
+
     const text = ocrResponse.text[0]
-    
+
     return {
-      name: text.match(/Name:\s*([A-Z\s]+)/i)?.[1]?.trim() || 
+      name: text.match(/Name:\s*([A-Z\s]+)/i)?.[1]?.trim() ||
             text.match(/NAME:\s*([A-Z\s]+)/i)?.[1]?.trim() || 'Not found',
-      
-      address: text.match(/S\/Address:\s*([^\n\r]+)/i)?.[1]?.trim() || 
+
+      address: text.match(/S\/Address:\s*([^\n\r]+)/i)?.[1]?.trim() ||
                text.match(/S\/ADDRESS:\s*([^\n\r]+)/i)?.[1]?.trim() ||
                text.match(/NO\.\s*\d+[^\\n\\r]*/i)?.[0]?.trim() || 'Not found',
-      
+
       accountNumber: text.match(/AccountNo[:\s]*([0-9\/\-]+)/i)?.[1]?.trim() ||
-                     text.match(/ACCOUNTNO[:\s]*([0-9\/\-]+)/i)?.[1]?.trim() || 
+                     text.match(/ACCOUNTNO[:\s]*([0-9\/\-]+)/i)?.[1]?.trim() ||
                      'Not found',
-      
+
       provider: text.match(/Provider[:\s]*([A-Z\s]+)/i)?.[1]?.trim() ||
                 text.match(/DISCO[:\s]*([A-Z\s]+)/i)?.[1]?.trim() ||
                 'Not found',
-                
+
       billDate: text.match(/Date[:\s]*([A-Z0-9\s]+)/i)?.[1]?.trim() ||
                 text.match(/BILL\s*DATE[:\s]*([A-Z0-9\s]+)/i)?.[1]?.trim() ||
                 'Not found',
-      
+
       mobile: text.match(/MOBILE[:\s]*([0-9]+)/i)?.[1]?.trim() ||
-              text.match(/Mobile[:\s]*([0-9]+)/i)?.[1]?.trim() || 
+              text.match(/Mobile[:\s]*([0-9]+)/i)?.[1]?.trim() ||
               'Not found',
-              
-      totalDue: text.match(/Total\s*Due[:\s=N=]*([0-9,\.]+)/i)?.[1]?.trim() || 
+
+      totalDue: text.match(/Total\s*Due[:\s=N=]*([0-9,\.]+)/i)?.[1]?.trim() ||
                 text.match(/Amount[:\s=N=]*([0-9,\.]+)/i)?.[1]?.trim() ||
                 'Not found'
     }
@@ -88,281 +90,201 @@ const Result = () => {
 
   const billInfo = ocrData ? extractImportantInfo(ocrData) : {}
 
+  const handleStartNew = () => {
+    localStorage.removeItem('bvnData')
+    localStorage.removeItem('inputAddress')
+    localStorage.removeItem('ocrResponse')
+    localStorage.removeItem('userBvn')
+    navigate('/verify')
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Header - Mobile Responsive */}
-      <div className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm border-b border-gray-700/50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-500/20 backdrop-blur-sm rounded-full mb-3 sm:mb-4 border border-green-500/30">
-              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    <div className="max-w-2xl mx-auto">
+      {/* Success Header */}
+      <div className="text-center mb-8">
+        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+          isDocumentVerification
+            ? 'bg-amber-500/20 border border-amber-500/30'
+            : 'bg-green-500/20 border border-green-500/30'
+        }`}>
+          {isDocumentVerification ? (
+            <svg className="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ) : (
+            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </div>
+        <h1 className="text-2xl font-bold font-['Poppins'] text-white mb-2">
+          {isDocumentVerification ? 'Verification Submitted' : 'Verification Complete'}
+        </h1>
+        <p className="text-gray-400">
+          {isDocumentVerification
+            ? 'Your documents are pending manual review'
+            : 'Your address has been verified successfully'}
+        </p>
+      </div>
+
+      {/* Status Banner */}
+      <div className={`rounded-lg p-4 mb-6 ${
+        isDocumentVerification
+          ? 'bg-amber-500/10 border border-amber-500/20'
+          : 'bg-green-500/10 border border-green-500/20'
+      }`}>
+        <div className="flex items-center space-x-3">
+          <div className={`w-2 h-2 rounded-full ${isDocumentVerification ? 'bg-amber-400' : 'bg-green-400'}`}></div>
+          <span className={`text-sm font-medium ${isDocumentVerification ? 'text-amber-300' : 'text-green-300'}`}>
+            {isDocumentVerification ? 'Manual Review Required (3-5 business days)' : 'Address Verified via GPS'}
+          </span>
+        </div>
+      </div>
+
+      {/* User Information Card */}
+      {bvnData && (
+        <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-5 mb-4">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-[#A350B6]/20 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-[#A350B6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
-              {isDocumentVerification ? 'Verification Submitted' : 'Verification Complete'}
-            </h1>
-            <p className="text-sm sm:text-base text-gray-300">
-              {isDocumentVerification
-                ? 'Your documents have been submitted for review'
-                : 'Your identity verification has been successfully processed'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Alert Banner - Only show for document verification */}
-        {isDocumentVerification ? (
-          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg sm:rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm">
-            <div className="flex items-start space-x-3 sm:space-x-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base sm:text-lg font-semibold text-amber-300 mb-1 sm:mb-2">Manual Review Required</h3>
-                <p className="text-sm sm:text-base text-amber-200 leading-relaxed">
-                  Your documents have been received and will be manually reviewed by our team within 3-5 business days.
-                  We will contact you once the verification is complete.
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg sm:rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm">
-            <div className="flex items-start space-x-3 sm:space-x-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base sm:text-lg font-semibold text-green-300 mb-1 sm:mb-2">Address Verified</h3>
-                <p className="text-sm sm:text-base text-green-200 leading-relaxed">
-                  Your location has been verified successfully using GPS. Your address verification is complete.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Main Content Grid - Responsive Layout */}
-        <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
-          {/* BVN Information Card - Mobile First */}
-          <div className="lg:col-span-1">
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-xl">
-              <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white">BVN Information</h3>
-              </div>
-              
-              {bvnData ? (
-                <div className="space-y-4 sm:space-y-6">
-                  {bvnData.base64Image && (
-                    <div className="text-center mb-4 sm:mb-6">
-                      <div className="relative inline-block">
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg sm:rounded-xl bg-gray-700/50 border-2 border-gray-600/50 overflow-hidden">
-                          <img 
-                            src={`data:image/jpeg;base64,${bvnData.base64Image}`}
-                            alt="BVN Photo"
-                            className="w-full h-full object-cover"
-                            onLoad={() => console.log('Image loaded successfully')}
-                            onError={(e) => {
-                              console.log('Image failed to load:', e);
-                              e.target.style.display = 'none';
-                              e.target.parentNode.innerHTML = '<div class="w-full h-full bg-gray-700 flex items-center justify-center"><svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
-                            }}
-                          />
-                        </div>
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
-                          <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Full Name</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{bvnData.firstName} {bvnData.middleName} {bvnData.lastName}</p>
-                    </div>
-                    
-                    <div>
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">BVN Number</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1 font-mono break-all">{bvnData.bvn || bvnData.number || 'N/A'}</p>
-                    </div>
-                    
-                    <div>
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Date of Birth</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1">{bvnData.dateOfBirth || 'N/A'}</p>
-                    </div>
-                    
-                    <div>
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Phone Number</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1 font-mono break-all">{bvnData.phoneNumber1 || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-6 sm:py-8">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-700/50 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">No BVN data available</p>
-                </div>
-              )}
-            </div>
+            <h3 className="text-base font-semibold text-white">Identity Information</h3>
           </div>
 
-          {/* Right Column - Mobile Responsive */}
-          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
-            {/* Address Card */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-xl">
-              <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+          <div className="flex items-start space-x-4">
+            {bvnData.base64Image && (
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-lg bg-gray-800 border border-gray-700 overflow-hidden">
+                  <img
+                    src={`data:image/jpeg;base64,${bvnData.base64Image}`}
+                    alt="BVN Photo"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none'
+                    }}
+                  />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white">Entered Address</h3>
               </div>
-              
-              {inputAddress ? (
-                <div className="bg-gray-700/30 rounded-lg p-3 sm:p-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">House Number</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.houseNumber || 'N/A'}</p>
-                    </div>
-                    
-                    <div>
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">City</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.city || 'N/A'}</p>
-                    </div>
-                    
-                    <div className="sm:col-span-2">
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Street</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.street || 'N/A'}</p>
-                    </div>
-                    
-                    <div>
-                      <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">State</label>
-                      <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{inputAddress.state || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-6 sm:py-8">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-700/50 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">No address data available</p>
-                </div>
-              )}
-            </div>
-
-            {/* Bill Information Card */}
-            <div className="bg-gray-800/60 backdrop-blur-xl border border-gray-700/50 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-xl">
-              <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white">Bill Information</h3>
+            )}
+            <div className="flex-1 grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Full Name</p>
+                <p className="text-sm text-white font-medium">{bvnData.firstName} {bvnData.middleName} {bvnData.lastName}</p>
               </div>
-              
-              {ocrData ? (
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    <div className="space-y-3 sm:space-y-4">
-                      <div>
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Name on Bill</label>
-                        <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{billInfo.name}</p>
-                      </div>
-                      
-                      <div>
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Account Number</label>
-                        <p className="text-sm sm:text-base text-white font-medium mt-1 font-mono break-all">{billInfo.accountNumber}</p>
-                      </div>
-                      
-                      <div>
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Service Provider</label>
-                        <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{billInfo.provider}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3 sm:space-y-4">
-                      <div>
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Bill Date</label>
-                        <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">{billInfo.billDate}</p>
-                      </div>
-                      
-                      <div>
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Mobile Number</label>
-                        <p className="text-sm sm:text-base text-white font-medium mt-1 font-mono break-all">{billInfo.mobile}</p>
-                      </div>
-                      
-                      <div>
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Due</label>
-                        <p className="text-sm sm:text-base text-white font-medium mt-1 break-words">₦{billInfo.totalDue}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Address on Bill</label>
-                    <div className="bg-gray-700/30 rounded-lg p-3 sm:p-4 mt-2">
-                      <p className="text-sm sm:text-base text-white font-medium leading-relaxed break-words whitespace-pre-wrap">
-                        {billInfo.address}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-6 sm:py-8">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-700/50 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">No document data available</p>
-                </div>
-              )}
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">BVN</p>
+                <p className="text-sm text-white font-mono">{bvnData.bvn || bvnData.number || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Date of Birth</p>
+                <p className="text-sm text-white">{bvnData.dateOfBirth || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Phone</p>
+                <p className="text-sm text-white font-mono">{bvnData.phoneNumber1 || 'N/A'}</p>
+              </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Footer Information - No Button */}
-        <div className="text-center mt-8 sm:mt-12 pb-6 sm:pb-8">
-          <div className="px-4">
-            <p className="text-sm sm:text-base text-gray-400 leading-relaxed max-w-2xl mx-auto">
-              {isDocumentVerification ? (
-                <>
-                  Your information is securely stored and will be reviewed by our team.
-                  <br className="hidden sm:block" />
-                  We'll contact you within 3-5 business days with the verification results.
-                </>
-              ) : (
-                'Your verification is complete. Thank you for using IllumiTrust.'
-              )}
-            </p>
+      {/* Address Card */}
+      {inputAddress && (
+        <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-5 mb-4">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 className="text-base font-semibold text-white">Verified Address</h3>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">House Number</p>
+              <p className="text-sm text-white">{inputAddress.houseNumber || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">City</p>
+              <p className="text-sm text-white">{inputAddress.city || 'N/A'}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Street</p>
+              <p className="text-sm text-white">{inputAddress.street || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">State</p>
+              <p className="text-sm text-white">{inputAddress.state || 'N/A'}</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Bill Information Card (only for document verification) */}
+      {ocrData && (
+        <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-5 mb-4">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-base font-semibold text-white">Submitted Document</h3>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Name on Bill</p>
+              <p className="text-sm text-white">{billInfo.name}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Account No.</p>
+              <p className="text-sm text-white font-mono">{billInfo.accountNumber}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Provider</p>
+              <p className="text-sm text-white">{billInfo.provider}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Bill Date</p>
+              <p className="text-sm text-white">{billInfo.billDate}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Address on Bill</p>
+              <p className="text-sm text-white">{billInfo.address}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No Data State */}
+      {!bvnData && !inputAddress && !ocrData && (
+        <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-8 text-center mb-6">
+          <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <p className="text-gray-400 text-sm">No verification data found</p>
+        </div>
+      )}
+
+      {/* Action Button */}
+      <button
+        onClick={handleStartNew}
+        className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+      >
+        Start New Verification
+      </button>
+
+      {/* Footer */}
+      <p className="text-center text-xs text-gray-500 mt-6">
+        Powered by IllumiTrust • Secure KYC Verification
+      </p>
     </div>
   )
 }
