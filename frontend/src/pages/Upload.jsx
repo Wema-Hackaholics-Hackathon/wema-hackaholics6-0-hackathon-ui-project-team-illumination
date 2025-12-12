@@ -147,6 +147,12 @@ const Upload = () => {
                   </svg>
                   <p className="text-red-300 text-sm">{error}</p>
                 </div>
+                <button
+                  onClick={() => setError(null)}
+                  className="mt-3 text-sm text-red-300 hover:text-red-200 underline"
+                >
+                  Try Again
+                </button>
               </div>
             )}
 

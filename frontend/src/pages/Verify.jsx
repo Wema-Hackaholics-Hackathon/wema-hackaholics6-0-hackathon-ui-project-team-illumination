@@ -90,6 +90,12 @@ const Verify = () => {
             <span className="text-red-300 text-sm font-medium">Verification Failed</span>
           </div>
           <p className="text-red-200 text-sm mt-2">{error}</p>
+          <button
+            onClick={() => setError('')}
+            className="mt-3 text-sm text-red-300 hover:text-red-200 underline"
+          >
+            Try Again
+          </button>
         </div>
       )}
 

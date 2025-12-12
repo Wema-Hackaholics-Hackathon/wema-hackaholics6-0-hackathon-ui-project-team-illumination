@@ -253,16 +253,16 @@ const Location = () => {
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Verification Error</h2>
           <p className="text-gray-400 mb-6">{error}</p>
-          <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => setError(null)}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded-xl transition-colors"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded-xl transition-colors"
             >
               Try Again
             </button>
             <button
               onClick={() => navigate('/address')}
-              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-xl transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-6 py-3 rounded-xl transition-colors"
             >
               Go Back
             </button>

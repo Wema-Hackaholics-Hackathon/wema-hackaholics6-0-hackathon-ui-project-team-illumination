@@ -150,6 +150,12 @@ const Address = () => {
           <h2 className="text-xl font-semibold text-white mb-2">Getting Your Location</h2>
           <p className="text-gray-400">Please wait while we search for your address...</p>
           <p className="text-gray-500 text-sm mt-2">This may take a few seconds</p>
+          <button
+            onClick={() => setIsLoading(false)}
+            className="mt-6 text-gray-400 hover:text-white underline text-sm"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     )
@@ -173,6 +179,12 @@ const Address = () => {
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
             <p className="text-sm text-red-300">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="mt-3 text-sm text-red-300 hover:text-red-200 underline"
+            >
+              Try Again
+            </button>
           </div>
         )}
 
@@ -194,8 +206,14 @@ const Address = () => {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gray-900/95 backdrop-blur rounded-2xl max-w-md w-full border border-gray-700/50 shadow-2xl">
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowModal(false)}
+          >
+            <div
+              className="bg-gray-900/95 backdrop-blur rounded-2xl max-w-md w-full border border-gray-700/50 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">

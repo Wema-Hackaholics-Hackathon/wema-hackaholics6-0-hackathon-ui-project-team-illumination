@@ -5,32 +5,47 @@ const Result = () => {
   const [inputAddress, setInputAddress] = useState(null)
   const [ocrData, setOcrData] = useState(null)
 
+  // Check if user came via document upload (has OCR data) or GPS verification
+  const isDocumentVerification = ocrData !== null
+
   useEffect(() => {
     console.log('Loading data from localStorage...')
-    
+
     const savedBvnData = localStorage.getItem('bvnData')
     if (savedBvnData) {
-      const parsed = JSON.parse(savedBvnData)
-      setBvnData(parsed)
-      console.log('BVN Data loaded:', parsed)
+      try {
+        const parsed = JSON.parse(savedBvnData)
+        setBvnData(parsed)
+        console.log('BVN Data loaded:', parsed)
+      } catch (e) {
+        console.error('Error parsing BVN data:', e)
+      }
     } else {
       console.log('No BVN data found')
     }
 
     const savedInputAddress = localStorage.getItem('inputAddress')
     if (savedInputAddress) {
-      const parsed = JSON.parse(savedInputAddress)
-      setInputAddress(parsed)
-      console.log('Input Address loaded:', parsed)
+      try {
+        const parsed = JSON.parse(savedInputAddress)
+        setInputAddress(parsed)
+        console.log('Input Address loaded:', parsed)
+      } catch (e) {
+        console.error('Error parsing input address:', e)
+      }
     } else {
       console.log('No inputAddress found')
     }
 
     const savedOcrData = localStorage.getItem('ocrResponse')
     if (savedOcrData) {
-      const parsed = JSON.parse(savedOcrData)
-      setOcrData(parsed)
-      console.log('OCR Data loaded:', parsed)
+      try {
+        const parsed = JSON.parse(savedOcrData)
+        setOcrData(parsed)
+        console.log('OCR Data loaded:', parsed)
+      } catch (e) {
+        console.error('Error parsing OCR data:', e)
+      }
     } else {
       console.log('No OCR data found')
     }
@@ -84,30 +99,54 @@ const Result = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Verification Complete</h1>
-            <p className="text-sm sm:text-base text-gray-300">Your identity verification has been successfully processed</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
+              {isDocumentVerification ? 'Verification Submitted' : 'Verification Complete'}
+            </h1>
+            <p className="text-sm sm:text-base text-gray-300">
+              {isDocumentVerification
+                ? 'Your documents have been submitted for review'
+                : 'Your identity verification has been successfully processed'}
+            </p>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Alert Banner - Mobile Responsive */}
-        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg sm:rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm">
-          <div className="flex items-start space-x-3 sm:space-x-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-amber-300 mb-1 sm:mb-2">Manual Review Required</h3>
-              <p className="text-sm sm:text-base text-amber-200 leading-relaxed">
-                Your documents have been received and will be manually reviewed by our team within 3-5 business days. 
-                We will contact you once the verification is complete.
-              </p>
+        {/* Alert Banner - Only show for document verification */}
+        {isDocumentVerification ? (
+          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg sm:rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm">
+            <div className="flex items-start space-x-3 sm:space-x-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold text-amber-300 mb-1 sm:mb-2">Manual Review Required</h3>
+                <p className="text-sm sm:text-base text-amber-200 leading-relaxed">
+                  Your documents have been received and will be manually reviewed by our team within 3-5 business days.
+                  We will contact you once the verification is complete.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg sm:rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm">
+            <div className="flex items-start space-x-3 sm:space-x-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold text-green-300 mb-1 sm:mb-2">Address Verified</h3>
+                <p className="text-sm sm:text-base text-green-200 leading-relaxed">
+                  Your location has been verified successfully using GPS. Your address verification is complete.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Main Content Grid - Responsive Layout */}
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
@@ -311,9 +350,15 @@ const Result = () => {
         <div className="text-center mt-8 sm:mt-12 pb-6 sm:pb-8">
           <div className="px-4">
             <p className="text-sm sm:text-base text-gray-400 leading-relaxed max-w-2xl mx-auto">
-              Your information is securely stored and will be reviewed by our team.
-              <br className="hidden sm:block" />
-              We'll contact you within 3-5 business days with the verification results.
+              {isDocumentVerification ? (
+                <>
+                  Your information is securely stored and will be reviewed by our team.
+                  <br className="hidden sm:block" />
+                  We'll contact you within 3-5 business days with the verification results.
+                </>
+              ) : (
+                'Your verification is complete. Thank you for using IllumiTrust.'
+              )}
             </p>
           </div>
         </div>

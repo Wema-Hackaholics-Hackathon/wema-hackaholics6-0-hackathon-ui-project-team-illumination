@@ -224,8 +224,6 @@ const App = () => {
               console.error('❌ Location access failed:', error)
               setLocationPermission('denied')
               setShowLocationModal(false)
-
-              alert('Location access is required for IllumiTrust verification features. Please enable location access in your browser settings and refresh the page.')
               reject(error)
             },
             {
