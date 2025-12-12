@@ -94,8 +94,8 @@ const YesResult = () => {
   const status = getVerificationStatus()
 
   const handleUploadDocument = () => {
-    // Navigate to address page, then user can choose document upload
-    navigate('/address')
+    // Navigate directly to upload page for document verification
+    navigate('/upload')
   }
 
   // For rejected - show simple message with options
@@ -167,7 +167,7 @@ const YesResult = () => {
     )
   }
 
-  // For pending, show simple waiting message
+  // For pending, show same style as failed with options
   if (status.status === 'pending') {
     return (
       <div className="max-w-2xl mx-auto">
@@ -182,16 +182,27 @@ const YesResult = () => {
             Verification Pending
           </h1>
           <p className="text-gray-400 max-w-md mx-auto">
-            Your verification is being reviewed by our team. This usually takes 1-2 business days.
+            Your location couldn't be fully verified. It's under manual review.
           </p>
         </div>
 
-        {/* Status Banner */}
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
-            <span className="text-sm font-medium text-amber-300">Manual Review in Progress</span>
-          </div>
+        {/* Info Card */}
+        <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-5 mb-6">
+          <h3 className="text-base font-semibold text-white mb-3">What you can do:</h3>
+          <ul className="space-y-3 text-sm text-gray-400">
+            <li className="flex items-start space-x-3">
+              <span className="w-5 h-5 bg-[#A350B6]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-[#A350B6] text-xs font-bold">1</span>
+              </span>
+              <span><strong className="text-white">Try again</strong> - Make sure you're physically at the address and GPS is enabled</span>
+            </li>
+            <li className="flex items-start space-x-3">
+              <span className="w-5 h-5 bg-[#A350B6]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-[#A350B6] text-xs font-bold">2</span>
+              </span>
+              <span><strong className="text-white">Upload a document</strong> - Use a utility bill or bank statement to verify your address</span>
+            </li>
+          </ul>
         </div>
 
         {/* Action Buttons */}
@@ -200,11 +211,17 @@ const YesResult = () => {
             onClick={handleStartNew}
             className="w-full bg-[#A350B6] hover:bg-[#8A42A1] text-white font-semibold py-3 px-6 rounded-lg transition-colors"
           >
-            Start New Verification
+            Try Again
+          </button>
+          <button
+            onClick={handleUploadDocument}
+            className="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition-colors border border-gray-700"
+          >
+            Upload Document Instead
           </button>
           <button
             onClick={handleGoHome}
-            className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-3 px-6 rounded-lg transition-colors border border-gray-700"
+            className="w-full text-gray-400 hover:text-white font-medium py-2 transition-colors text-sm"
           >
             Back to Home
           </button>
