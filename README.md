@@ -12,30 +12,34 @@
 ## 🚀 Live Demo
 
 *   **Live Application:** https://illumination-frontend.vercel.app
-*   **Backend API:** https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com/]
-*   **Recorded Demo:** [https://www.loom.com/share/15848b33cc4c419c89d60629fe2d4134].
+*   **Backend API:** https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com
+*   **Demo Video:** https://www.loom.com/share/94eda41ea8c845afb42004659d21aae8
 
 
 ---
 
 ## 🎯 The Problem
-How can we streamline the process of knowing a customer by banks and eliminate manual address verification?
+Banks spend significant time and money sending field agents to verify customer addresses during KYC (Know Your Customer) processes. This manual verification is slow, expensive, and delays customer onboarding.
 
 ## ✨ Our Solution
 
-"Our project, 'IllumiTrust' is a platform that aims to reduce the stress and inconvienince experienced by cs llows users to add tasks, mark them as complete, and sort them by priority. The goal is to provide a straightforward tool to help users stay organized."
+IllumiTrust solves this by verifying customer addresses instantly using BVN (Bank Verification Number) and GPS location technology. No field visits needed - verification happens in seconds.
+
+### How It Works
+1. **BVN Verification** - Customer enters their BVN
+2. **GPS Location** - System captures real-time GPS coordinates
+3. **Instant Verification** - Address is verified against BVN records in seconds
+4. **Alternative Option** - Upload document verification if GPS doesn't match
 
 ---
 
 ## 🛠️ Tech Stack
 
-*List the major technologies, frameworks, and platforms you used to build your project.*
-
-*   **Frontend:** ReactJS, Tailwind CSS
-*   **Backend:** Node.js + expressjs
+*   **Frontend:** React 19, React Router v7, Tailwind CSS, Vite
+*   **Backend:** Node.js, Express.js
 *   **Database:** MongoDB
-*   **Deployment:** Vercel(frontend), render(backend)
-*   **AI/APIs:** (e.g., Google Gemini API)
+*   **APIs:** Prembly API (BVN Verification), Browser Geolocation API
+*   **Deployment:** Vercel (Frontend), Render (Backend)
 
 ---
 
