@@ -13,7 +13,7 @@
 
 *   **Live Application:** https://illumination-frontend.vercel.app
 *   **Backend API:** https://wema-hackaholics6-0-hackathon-ui-project-ncjw.onrender.com
-*   **Demo Video:** https://www.loom.com/share/94eda41ea8c845afb42004659d21aae8
+*   **Demo Video:** https://www.loom.com/share/280c33b786c046ada31bed526a52c22f
 
 
 ---
